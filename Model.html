@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>TestClickEvent</title>
+</head>
+<body>
+<script src="js/three.min.js"></script>
+<script src="orbitControlls.js"></script>
+<script src="threeBSP.js"></script>
+<script src="dat.gui.js"></script>
+<script>
+    var scene = new THREE.Scene();
+
+    var camera = new THREE.PerspectiveCamera(45, window.innerWidth/window.innerHeight, 0.1, 15000);
+
+    var renderer = new THREE.WebGLRenderer();
+
+    var controls = new THREE.OrbitControls(camera);
+
+    var light = new THREE.AmbientLight(0xff0000, 0.2, 100, 2);
+    light.position.set(0,100,0);
+    scene.add(light);
+
+    controls.enableDamping = true;
+
+    renderer.setSize(window.innerWidth, window.innerHeight);
+
+    document.body.appendChild(renderer.domElement);
+
+    let loader = new THREE.TextureLoader();
+
+
+    let room = new THREE.Object3D();
+    let floor_tex = loader.load('img/floor1.jpg',function (floor_tex) {
+        floor_tex.wrapS = floor_tex.wrapT = THREE.RepeatWrapping;
+        floor_tex.repeat.set(4,4);
+    });
+
+
+    let floor_mat = new THREE.MeshBasicMaterial({map:floor_tex});
+
+    let floor = new THREE.Mesh(new THREE.BoxGeometry(700,10,700),floor_mat);
+    //let floor = new THREE.Mesh(new THREE.BoxGeometry(700,10,700),new THREE.MeshPhongMaterial({color:0x999999}));
+    floor.position.set(0,-95,0);
+    floor.material.map.wrapS = THREE.RepeatWrapping;
+    floor.material.map.wrapT = THREE.RepeatWrapping;
+    room.add(floor);
+
+    var r_wall_tex = loader.load('img/f_wall.jpg',function (texture) {
+        texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+        texture.repeat.set(4,4);
+    });
+    let r_wall1 = new THREE.Mesh(
+        new THREE.BoxGeometry(700, 50, 450),
+        new THREE.MeshBasicMaterial({color:0xffffff,map:r_wall_tex})
+    );
+
+    r_wall1.position.y = 130;
+    r_wall1.position.z = 350;
+    r_wall1.rotation.x = Math.PI/2;
+    room.add(r_wall1);
+
+    let r_wall2 = new THREE.Mesh(
+        new THREE.BoxGeometry(700, 50, 450),
+        new THREE.MeshBasicMaterial({color:0xffffff,map:r_wall_tex})
+    );
+
+    r_wall2.position.y = 130;
+    r_wall2.position.z = -350;
+    r_wall2.rotation.x = Math.PI/2;
+    room.add(r_wall2);
+
+    let r_wall3 = new THREE.Mesh(
+        new THREE.BoxGeometry(50, 450, 700),
+        new THREE.MeshBasicMaterial({color:0xffffff,map:r_wall_tex})
+    );
+
+    r_wall3.position.x = 350;
+    r_wall3.position.y = 130;
+    room.add(r_wall3);
+
+    let r_wall4 = new THREE.Mesh(
+        new THREE.BoxGeometry(50, 450, 700),
+        new THREE.MeshBasicMaterial({color:0xffffff,map:r_wall_tex})
+    );
+
+    r_wall4.position.x = -350;
+    r_wall4.position.y = 130;
+    r_wall4.material.map.wrapS = THREE.RepeatWrapping;
+    r_wall4.material.map.wrapT = THREE.RepeatWrapping;
+    room.add(r_wall4);
+    scene.add(room);
+
+
+    let Mechanical_arm = new THREE.Object3D();
+
+    let basic = new THREE.Mesh(new THREE.CylinderGeometry(20,20,10,40,40),new THREE.MeshBasicMaterial());
+    basic.position.y = -85;
+    Mechanical_arm.add(basic);
+    var torus = new THREE.Mesh(new THREE.TorusGeometry(20, 20, 25, 80, Math.PI / 2),
+        new THREE.MeshPhongMaterial({color : 0xffffff,transparent : true,opacity: 1,emissive : 0xffffff})
+    );
+    torus.position.set(-20,-80,0);
+    Mechanical_arm.add(torus);
+
+    let upper1 = new THREE.Mesh(new THREE.CylinderGeometry(20,20,5,40,40,false,0,Math.PI),new THREE.MeshBasicMaterial());
+    upper1.position.set(-22.5,-60,0);
+    upper1.rotation.z = -Math.PI/2;
+    let upper2 = new THREE.Mesh(new THREE.BoxGeometry(5,80,40),new THREE.MeshPhongMaterial());
+    upper2.position.set(-40,0,0);
+    upper2.rotation.z = -Math.PI/2;
+    upper1.add(upper2);
+    let upper3 = new THREE.Mesh(new THREE.CylinderGeometry(20,20,5,40,40,false,0,Math.PI),new THREE.MeshBasicMaterial());
+    upper3.position.set(-80,0,0);
+    upper3.rotation.z = Math.PI;
+    upper1.add(upper3);
+    Mechanical_arm.add(upper1);
+
+    let downer = upper1.clone();
+    downer.position.set(-80,-5,0);
+    downer.rotation.z = Math.PI;
+    downer.rotation.y = Math.PI/2;
+
+    upper1.add(downer);
+    Mechanical_arm.position.y = 150;
+    scene.add(Mechanical_arm);
+    camera.position.set(50,50,50);
+    camera.lookAt({
+        x:0,
+        y:0,
+        z:0
+    });
+    function render() {
+        controls.update();
+        downer.rotation.y += Math.PI/120;
+        upper1.rotation.x += Math.PI/120;
+        renderer.render(scene, camera);
+        requestAnimationFrame(render);
+    }
+
+    render();
+</script>
+</body>
+</html>
