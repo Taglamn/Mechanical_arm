@@ -24,7 +24,19 @@
     light.position.set(0,100,0);
     scene.add(light);
 
+    var light_d = new THREE.DirectionalLight(0xffffff,1);
+    scene.add(light_d);
+
     controls.enableDamping = true;
+
+    var dat_controls = {
+        暂停 : 1
+    };
+    var gui = new dat.GUI;
+    var folder = gui.addFolder('菜单');
+    gui.domElement.style = 'position:absolute;top:0px;right:0px';
+    folder.add(dat_controls, '暂停', 0, 1).step(1);
+    folder.open();
 
     renderer.setSize(window.innerWidth, window.innerHeight);
 
@@ -94,51 +106,176 @@
     room.add(r_wall4);
     scene.add(room);
 
+    let base = new THREE.Mesh(new THREE.CylinderGeometry(40,50,20,40,40),new THREE.MeshPhongMaterial({color : 0x357bdb, specular : 0x357bdb}));
+    base.position.y = -85;
+    scene.add(base);
+    let Cylinder1 = new THREE.Mesh(new THREE.CylinderGeometry(40,40,20,40,40),new THREE.MeshPhongMaterial({color : 0x357bdb, specular : 0x357bdb}));
+    let box1 = new THREE.Mesh(new THREE.BoxGeometry(70,50,70),new THREE.MeshPhongMaterial({color : 0x357bdb, specular : 0x357bdb}));
+    box1.position.x -= 20*Math.sqrt(2);
+    let box2 = new THREE.Mesh(new THREE.BoxGeometry(70,50,70),new THREE.MeshPhongMaterial({color : 0x357bdb, specular : 0x357bdb}));
+    box2.position.z -= 20*Math.sqrt(2)+30;
+    let box3 = new THREE.Mesh(new THREE.BoxGeometry(70,50,70),new THREE.MeshPhongMaterial({color : 0x357bdb, specular : 0x357bdb}));
+    box3.position.z += 20*Math.sqrt(2)+30;
+    let bsp_Cylinder1 = new ThreeBSP(Cylinder1);
+    let bsp_box1 = new ThreeBSP(box1);
+    let bsp_box2 = new ThreeBSP(box2);
+    let bsp_box3 = new ThreeBSP(box3);
+    let bsp_axis_1 = bsp_Cylinder1.subtract(bsp_box1);
+    bsp_axis_1 = bsp_axis_1.subtract(bsp_box2);
+    bsp_axis_1 = bsp_axis_1.subtract(bsp_box3);
+    let axis_1_geo = bsp_axis_1.toMesh().geometry;
+    let axis_1 = new THREE.Mesh(axis_1_geo,new THREE.MeshPhongMaterial({color : 0x357bdb, specular : 0x357bdb}));
+    axis_1.position.y = -65;
+    scene.add(axis_1);
 
-    let Mechanical_arm = new THREE.Object3D();
+    let arm_cube = new THREE.Mesh(new THREE.BoxGeometry(50,5,50),new THREE.MeshPhongMaterial({color : 0x357bdb, specular : 0x357bdb}));
+    let arm_cube_sub = new THREE.Mesh(new THREE.BoxGeometry(50,5,90),new THREE.MeshPhongMaterial({color : 0x357bdb, specular : 0x357bdb}));
+    arm_cube_sub.rotation.y = Math.PI/6;
+    arm_cube_sub.position.x += 40;
+    let arm_cube_sub1 = new THREE.Mesh(new THREE.BoxGeometry(50,5,90),new THREE.MeshPhongMaterial({color : 0x357bdb, specular : 0x357bdb}));
+    arm_cube_sub1.rotation.y = Math.PI/6;
+    arm_cube_sub1.position.x -= 43;
+    let bsp_arm_cube = new ThreeBSP(arm_cube);
+    let bsp_arm_cube_sub = new ThreeBSP(arm_cube_sub);
+    let bsp_arm_cube_sub1 = new ThreeBSP(arm_cube_sub1);
+    let bsp_axis_1_arm1 = bsp_arm_cube.subtract(bsp_arm_cube_sub);
+    bsp_axis_1_arm1 = bsp_axis_1_arm1.subtract(bsp_arm_cube_sub1);
+    let axis_1_arm1 = new THREE.Mesh(bsp_axis_1_arm1.toMesh().geometry,new THREE.MeshPhongMaterial({color : 0x357bdb, specular : 0x357bdb}));
+    axis_1_arm1.position.set(0,10,-25.7);
+    axis_1_arm1.rotation.x = -Math.PI/2;
+    axis_1_arm1.rotation.y = -Math.PI/2;
 
-    let basic = new THREE.Mesh(new THREE.CylinderGeometry(20,20,10,40,40),new THREE.MeshBasicMaterial());
-    basic.position.y = -85;
-    Mechanical_arm.add(basic);
-    var torus = new THREE.Mesh(new THREE.TorusGeometry(20, 20, 25, 80, Math.PI / 2),
-        new THREE.MeshPhongMaterial({color : 0xffffff,transparent : true,opacity: 1,emissive : 0xffffff})
-    );
-    torus.position.set(-20,-80,0);
-    Mechanical_arm.add(torus);
+    let axis_1_arm2 = new THREE.Object3D();
+    axis_1_arm2 = axis_1_arm1.clone();
+    axis_1_arm2.position.z += 51.4;
+    axis_1.add(axis_1_arm1);
+    axis_1.add(axis_1_arm2);
 
-    let upper1 = new THREE.Mesh(new THREE.CylinderGeometry(20,20,5,40,40,false,0,Math.PI),new THREE.MeshBasicMaterial());
-    upper1.position.set(-22.5,-60,0);
-    upper1.rotation.z = -Math.PI/2;
-    let upper2 = new THREE.Mesh(new THREE.BoxGeometry(5,80,40),new THREE.MeshPhongMaterial());
-    upper2.position.set(-40,0,0);
-    upper2.rotation.z = -Math.PI/2;
-    upper1.add(upper2);
-    let upper3 = new THREE.Mesh(new THREE.CylinderGeometry(20,20,5,40,40,false,0,Math.PI),new THREE.MeshBasicMaterial());
-    upper3.position.set(-80,0,0);
-    upper3.rotation.z = Math.PI;
-    upper1.add(upper3);
-    Mechanical_arm.add(upper1);
+    let axis_2 = new THREE.Mesh(new THREE.CylinderGeometry(15,15,70,40,40),new THREE.MeshPhongMaterial({color : 0x357bdb, specular : 0x357bdb}));
+    axis_2.rotation.x = Math.PI/2;
+    axis_2.position.set(-30,-40,0);
 
-    let downer = upper1.clone();
-    downer.position.set(-80,-5,0);
-    downer.rotation.z = Math.PI;
-    downer.rotation.y = Math.PI/2;
 
-    upper1.add(downer);
-    Mechanical_arm.position.y = 150;
-    scene.add(Mechanical_arm);
-    camera.position.set(50,50,50);
+    let axis_2_arm = new THREE.Mesh(new THREE.BoxGeometry(20,70,20),new THREE.MeshPhongMaterial({color : 0x357bdb, specular : 0x357bdb}));
+    axis_2_arm.rotation.x = Math.PI/2;
+    axis_2_arm.rotation.z = Math.PI/6;
+    axis_2_arm.position.set(15,0,-30);
+    axis_2.add(axis_2_arm);
+
+    let axis_2_arm2 = new THREE.Object3D();
+    let axis_2_arm1 = new THREE.Mesh(bsp_axis_1_arm1.toMesh().geometry,new THREE.MeshPhongMaterial({color : 0x357bdb, specular : 0x357bdb}));
+    axis_2_arm1.scale.set(1,4,0.8);
+    axis_2_arm1.position.set(40,20,-70);
+    axis_2_arm1.rotation.x = Math.PI;
+    axis_2_arm2 = axis_2_arm1.clone();
+    axis_2_arm2.position.y -= 40;
+
+    axis_2.add(axis_2_arm1);
+    axis_2.add(axis_2_arm2);
+    axis_1.add(axis_2);
+    axis_2.position.y += 65;
+
+    let axis_3 = new THREE.Mesh(new THREE.CylinderGeometry(16,16,40,40,40),new THREE.MeshPhongMaterial({color : 0x357bdb, specular : 0x357bdb}));
+    axis_3.position.set(50,0,-90);
+    let axis_3_con = new THREE.Mesh(new THREE.BoxGeometry(20,5,15),new THREE.MeshPhongMaterial({color : 0x357bdb, specular : 0x357bdb}));
+    axis_3_con.rotation.y = Math.PI/6;
+    axis_3_con.position.set(-5,0,-15);
+    axis_3.add(axis_3_con);
+    let axis_3_arm = new THREE.Mesh(new THREE.CylinderGeometry(15,15,40,8,8),new THREE.MeshPhongMaterial({color : 0x357bdb, specular : 0x357bdb}));
+    axis_3_arm.rotation.z += Math.PI/2;
+    axis_3_arm.rotation.x = Math.PI/8;
+    axis_3.add(axis_3_arm);
+    axis_3_arm.position.set(-8,0,-28);
+    let axis_3_arm_s = new THREE.Object3D();
+    axis_3_arm_s = axis_3_arm.clone();
+    axis_3_arm_s.position.x -= 40;
+    axis_3_arm_s.scale.set(0.5,1,0.5);
+    axis_3.add(axis_3_arm_s);
+    axis_2.add(axis_3);
+
+    let axis_4 = new THREE.Mesh(new THREE.CylinderGeometry(5,5,1,40,40),new THREE.MeshPhongMaterial({color : 0x357bdb, specular : 0x357bdb}));
+    axis_4.rotation.z = Math.PI/2;
+    axis_4.position.set(-78,0,-28);
+    axis_3.add(axis_4);
+    let axis_4_con = new THREE.Mesh(new THREE.CylinderGeometry(5,5,30,20,20),new THREE.MeshPhongMaterial({color : 0x357bdb, specular : 0x357bdb}));
+    axis_4_con.position.set(0,5,0);
+
+    axis_4.add(axis_4_con);
+    let axis_5 = new THREE.Mesh(new THREE.BoxGeometry(22,1,20),new THREE.MeshPhongMaterial({color : 0x357bdb, specular : 0x357bdb}));
+    axis_5.position.y += 20;
+    let axis_5_arm1 = new THREE.Mesh(new THREE.BoxGeometry(1,40,20),new THREE.MeshPhongMaterial({color : 0x357bdb, specular : 0x357bdb}));
+    axis_5_arm1.position.set(11,20.5,0);
+    let axis_5_arm2;
+    axis_5_arm2 = axis_5_arm1.clone();
+    axis_5_arm2.position.x -= 22;
+    axis_5.add(axis_5_arm2);
+    axis_5.add(axis_5_arm1);
+    let axis_5_torus = new THREE.Mesh(new THREE.BoxGeometry(21, 20, 20), new THREE.MeshPhongMaterial({color : 0x357bdb, specular : 0x357bdb}));
+    axis_5_torus.position.set(0,31,0);
+    let axis_5_torus_con = new THREE.Mesh(new THREE.BoxGeometry(21,1,20), new THREE.MeshPhongMaterial({color : 0x357bdb, specular : 0x357bdb}));
+    axis_5_torus_con.position.set(0,9.5,20);
+    let axis_5_torus_con1 = new THREE.Mesh(new THREE.BoxGeometry(21,20,1),new THREE.MeshPhongMaterial({color : 0x357bdb, specular : 0x357bdb}));
+    axis_5_torus_con1.position.set(0,0,30.5);
+    axis_5_torus.add(axis_5_torus_con1);
+    axis_5_torus.add(axis_5_torus_con);
+    axis_5.add(axis_5_torus);
+    axis_4.add(axis_5);
+
+
+    let axis_6 = new THREE.Mesh(new THREE.CylinderGeometry(10,10,4,40,40),new THREE.MeshPhongMaterial({color : 0x357bdb, specular : 0x357bdb}));
+    axis_6.rotation.x += Math.PI/2;
+    axis_6.position.set(0,0,32.5);
+    axis_5_torus.add(axis_6);
+    let used = new THREE.Mesh(new THREE.CylinderGeometry(2,2,20,40,40),new THREE.MeshPhongMaterial({color : 0x357bdb, specular : 0x357bdb}));
+    used.position.set(1,5,1);
+    axis_6.add(used);
+
+    axis_5.rotation.y = Math.PI/3;
+    camera.position.set(-191,106,70);
     camera.lookAt({
         x:0,
         y:0,
         z:0
     });
+    let v1 = 0.01,v2 = 0.01,v3 = 0.01,v4 = 0.01,v5 = 0.01,v6 = 0.5 , v4_1 = 0.01;
+    let pause = 0;
     function render() {
         controls.update();
-        downer.rotation.y += Math.PI/120;
-        upper1.rotation.x += Math.PI/120;
+        pause = dat_controls.暂停;
+
+        if (axis_2.rotation.y >= 1 * Math.PI / 3)
+            v2 = -0.01;
+        else if (axis_2.rotation.y <= -Math.PI / 8)
+            v2 = 0.01;
+        if (axis_3.rotation.y >= Math.PI / 6)
+            v3 = -0.01;
+        else if (axis_3.rotation.y <= -Math.PI / 3)
+            v3 = 0.01;
+        if (axis_4.rotation.x >= Math.PI / 3)
+            v4 = -0.01;
+        else if (axis_4.rotation.x <= -Math.PI / 3)
+            v4 = 0.01;
+        if (axis_5_torus.rotation.x >= Math.PI / 7)
+            v5 = -0.01;
+        else if (axis_5_torus.rotation.x <= -Math.PI/2 )
+            v5 = 0.01;
+        if (axis_4.position.x <= -78)
+            v4_1 = 0.1;
+        else if (axis_4.position.x >= -58)
+            v4_1 = -0.1;
+        if (!pause) {
+            //axis_1.rotation.y += v1;
+            //axis_2.rotation.y += v2;
+            //axis_3.rotation.y += v3;
+            axis_4.rotation.x += v4;
+            axis_4.position.x += v4_1;
+            //axis_5.position.x += 1;
+            axis_5_torus.rotation.x += v5;
+            axis_6.rotation.y += v6;
+        }
         renderer.render(scene, camera);
         requestAnimationFrame(render);
+
     }
 
     render();
