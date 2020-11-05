@@ -32,10 +32,101 @@
     var dat_controls = {
         暂停 : 1
     };
+    var dat_controls_axis1 = {
+        旋转角度下限 : -180,
+        旋转角度上限 : 180
+    };
+    var dat_controls_axis2 = {
+        旋转角度下限 : -22.5,
+        旋转角度上限 : 45
+    };
+    var dat_controls_axis3 = {
+        旋转角度下限 : -60,
+        旋转角度上限 : 30
+    };
+    var dat_controls_axis4 = {
+        旋转角度下限 : -60,
+        旋转角度上限 : 60,
+        伸缩长度上限 : 20,
+        伸缩长度下限 : 0
+
+    };
+    var dat_controls_axis5 = {
+        旋转角度下限 : -90,
+        旋转角度上限 : 30
+    };
+    var dat_controls_axis6 = {
+        旋转角度下限 : -180,
+        旋转角度上限 : 180
+    };
     var gui = new dat.GUI;
     var folder = gui.addFolder('菜单');
+
     gui.domElement.style = 'position:absolute;top:0px;right:0px';
     folder.add(dat_controls, '暂停', 0, 1).step(1);
+    var gui_axis1 = folder.addFolder('轴一');
+    gui_axis1.add(dat_controls_axis1, '旋转角度上限', -180, 180).step(0.1).onChange(function () {
+        if (a1_max <= a1_min)
+            a1_max = a1_min;
+    });
+    gui_axis1.add(dat_controls_axis1, '旋转角度下限', -180, 180).step(0.1).onChange(function () {
+        if (a1_min <= a1_max)
+            a1_min = a1_max;
+    });
+    var gui_axis2 = folder.addFolder('轴二');
+    gui_axis2.add(dat_controls_axis2, '旋转角度上限', -180, 180).step(0.1).onChange(function () {
+        if (a2_max <= a2_min)
+            a2_max = a2_min;
+    });
+    gui_axis2.add(dat_controls_axis2, '旋转角度下限', -180, 180).step(0.1).onChange(function () {
+        if (a2_min <= a2_max)
+            a2_min = a2_max;
+    });
+    var gui_axis3 = folder.addFolder('轴三');
+    gui_axis3.add(dat_controls_axis3, '旋转角度上限', -180, 180).step(0.1).onChange(function () {
+        if (a2_max <= a2_min)
+            a2_max = a2_min;
+    });
+    gui_axis3.add(dat_controls_axis3, '旋转角度下限', -180, 180).step(0.1).onChange(function () {
+        if (a2_min <= a2_max)
+            a2_min = a2_max;
+    });
+    var gui_axis4 = folder.addFolder('轴四');
+    gui_axis4.add(dat_controls_axis4, '旋转角度上限', -180, 180).step(0.1).onChange(function () {
+        if (a3_max <= a3_min)
+            a3_max = a3_min;
+    });
+    gui_axis4.add(dat_controls_axis4, '旋转角度下限', -180, 180).step(0.1).onChange(function () {
+        if (a3_min <= a3_max)
+            a3_min = a3_max;
+    });
+    gui_axis4.add(dat_controls_axis4, '伸缩长度上限', 0, 20).step(0.1).onChange(function () {
+        if (a4_max <= a4_min)
+            a4_max = a4_min;
+    });
+    gui_axis4.add(dat_controls_axis4, '伸缩长度下限', 0, 20).step(0.1).onChange(function () {
+        if (a4_min <= a4_max)
+            a4_min = a4_max;
+    });
+    var gui_axis5 = folder.addFolder('轴五');
+    gui_axis5.add(dat_controls_axis5, '旋转角度上限', -180, 180).step(0.1).onChange(function () {
+        if (a5_max <= a5_min)
+            a5_max = a5_min;
+    });
+    gui_axis5.add(dat_controls_axis5, '旋转角度下限', -180, 180).step(0.1).onChange(function () {
+        if (a5_min <= a5_max)
+            a5_min = a5_max;
+    });
+    var gui_axis6 = folder.addFolder('轴六');
+    gui_axis6.add(dat_controls_axis6, '旋转角度上限', -180, 180).step(0.1).onChange(function () {
+        if (a6_max <= a6_min)
+            a6_max = a6_min;
+    });
+    gui_axis6.add(dat_controls_axis6, '旋转角度下限', -180, 180).step(0.1).onChange(function () {
+        if (a6_min <= a6_max)
+            a6_min = a6_max;
+    });
+
     folder.open();
 
     renderer.setSize(window.innerWidth, window.innerHeight);
@@ -227,7 +318,7 @@
     axis_6.position.set(0,0,32.5);
     axis_5_torus.add(axis_6);
     let used = new THREE.Mesh(new THREE.CylinderGeometry(2,2,20,40,40),new THREE.MeshPhongMaterial({color : 0x357bdb, specular : 0x357bdb}));
-    used.position.set(1,5,1);
+    used.position.set(1,8,1);
     axis_6.add(used);
 
     axis_5.rotation.y = Math.PI/3;
@@ -238,40 +329,113 @@
         z:0
     });
     let v1 = 0.01,v2 = 0.01,v3 = 0.01,v4 = 0.01,v5 = 0.01,v6 = 0.5 , v4_1 = 0.01;
+    let a1_min, a1_max, a2_min, a2_max, a3_min, a3_max, a4_min, a4_max, a5_min, a5_max, a6_min, a6_max;
     let pause = 0;
     function render() {
         controls.update();
         pause = dat_controls.暂停;
-
-        if (axis_2.rotation.y >= 1 * Math.PI / 3)
-            v2 = -0.01;
-        else if (axis_2.rotation.y <= -Math.PI / 8)
-            v2 = 0.01;
-        if (axis_3.rotation.y >= Math.PI / 6)
-            v3 = -0.01;
-        else if (axis_3.rotation.y <= -Math.PI / 3)
-            v3 = 0.01;
-        if (axis_4.rotation.x >= Math.PI / 3)
-            v4 = -0.01;
-        else if (axis_4.rotation.x <= -Math.PI / 3)
-            v4 = 0.01;
-        if (axis_5_torus.rotation.x >= Math.PI / 7)
-            v5 = -0.01;
-        else if (axis_5_torus.rotation.x <= -Math.PI/2 )
-            v5 = 0.01;
-        if (axis_4.position.x <= -78)
+        a1_min = dat_controls_axis1.旋转角度下限/180*Math.PI;
+        a1_max = dat_controls_axis1.旋转角度上限/180*Math.PI;
+        a2_min = dat_controls_axis2.旋转角度下限/180*Math.PI;
+        a2_max = dat_controls_axis2.旋转角度上限/180*Math.PI;
+        a3_min = dat_controls_axis3.旋转角度下限/180*Math.PI;
+        a3_max = dat_controls_axis3.旋转角度上限/180*Math.PI;
+        a4_min = dat_controls_axis4.旋转角度下限/180*Math.PI;
+        a4_max = dat_controls_axis4.旋转角度上限/180*Math.PI;
+        a5_min = dat_controls_axis5.旋转角度下限/180*Math.PI;
+        a5_max = dat_controls_axis5.旋转角度上限/180*Math.PI;
+        a6_min = dat_controls_axis6.旋转角度下限/180*Math.PI;
+        a6_max = dat_controls_axis6.旋转角度上限/180*Math.PI;
+        if (a1_min != a1_max) {
+            if (axis_1.rotation.y >= a1_max) {
+                if (a1_min != a1_max)
+                    axis_1.rotation.y = a1_max;
+                v1 = -0.01;
+            } else if (axis_1.rotation.y <= a1_min) {
+                if (a1_min != a1_max)
+                    axis_1.rotation.y = a1_min;
+                v1 = 0.01;
+            }
+        }
+        if (a2_min != a2_max) {
+            if (axis_2.rotation.y >= a2_max) {
+                if (a2_min != a2_max)
+                    axis_2.rotation.y = a2_max;
+                v2 = -0.01;
+            } else if (axis_2.rotation.y <= a2_min) {
+                if (a2_min != a2_max)
+                    axis_2.rotation.y = a2_min;
+                v2 = 0.01;
+            }
+        }
+        if (a3_min != a3_max) {
+            if (axis_3.rotation.y >= a3_max) {
+                if (a3_min != a3_max)
+                    axis_3.rotation.y = a3_max;
+                v3 = -0.01;
+            } else if (axis_3.rotation.y <= a3_min) {
+                if (a3_min != a3_max)
+                    axis_3.rotation.y = a3_min;
+                v3 = 0.01;
+            }
+        }
+        if (a4_min != a4_max) {
+            if (axis_4.rotation.x >= a4_max) {
+                if (a4_min != a4_max)
+                    axis_4.rotation.x = a4_max;
+                v4 = -0.01;
+            } else if (axis_4.rotation.x <= a4_min) {
+                if (a4_min != a4_max)
+                    axis_4.rotation.x = a4_min;
+                v4 = 0.01;
+            }
+        }
+        if (a5_min != a5_max) {
+            if (axis_5_torus.rotation.x >= a5_max) {
+                if (a5_min != a5_max)
+                    axis_5_torus.rotation.x = a5_max;
+                v5 = -0.01;
+            } else if (axis_5_torus.rotation.x <= a5_min) {
+                if (a5_min != a5_max)
+                    axis_5_torus.rotation.x = a5_min;
+                v5 = 0.01;
+            }
+        }
+        if (axis_4.position.x <= -78) {
+            axis_4.position.x = -78;
             v4_1 = 0.1;
-        else if (axis_4.position.x >= -58)
+        }
+        else if (axis_4.position.x >= -58) {
+            axis_4.position.x = -58;
             v4_1 = -0.1;
+        }
+        if (a6_min != -Math.PI || a6_max != Math.PI) {
+            if (axis_6.rotation.y >= a6_max) {
+                if (a6_min != a6_max)
+                    axis_6.rotation.y = a6_max;
+                v6 = -0.5;
+            }
+            else if (axis_6.rotation.y <= a6_min) {
+                if (a6_min != a6_max)
+                    axis_6.rotation.y = a6_min;
+                v6 = 0.5;
+            }
+        }
+
         if (!pause) {
-            //axis_1.rotation.y += v1;
-            //axis_2.rotation.y += v2;
-            //axis_3.rotation.y += v3;
-            axis_4.rotation.x += v4;
+            if (a1_min > a1_max)
+                axis_1.rotation.y += v1;
+            if (a2_min > a2_max)
+                axis_2.rotation.y += v2;
+            if (a3_min > a3_max)
+                axis_3.rotation.y += v3;
+            if (a4_min > a4_max)
+                axis_4.rotation.x += v4;
             axis_4.position.x += v4_1;
-            //axis_5.position.x += 1;
-            axis_5_torus.rotation.x += v5;
-            axis_6.rotation.y += v6;
+            if (a5_min > a5_max)
+                axis_5_torus.rotation.x += v5;
+            if (a6_min > a6_max)
+                axis_6.rotation.y += v6;
         }
         renderer.render(scene, camera);
         requestAnimationFrame(render);
